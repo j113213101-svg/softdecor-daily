@@ -1,1 +1,144 @@
-init
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f0f1a">
+<title>軟裝日曆 ✦ 每日文案</title>
+<style>
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+@keyframes confetti{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(-200px) rotate(720deg)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Microsoft JhengHei",sans-serif;background:#0f0f1a;min-height:100vh;color:#e0e0e0;overflow-x:hidden}
+.bg-orbs{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.bg-orbs .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15}
+.bg-orbs .orb:nth-child(1){width:300px;height:300px;background:#667eea;top:-50px;left:-80px}
+.bg-orbs .orb:nth-child(2){width:250px;height:250px;background:#764ba2;bottom:10%;right:-60px}
+.bg-orbs .orb:nth-child(3){width:200px;height:200px;background:#f093fb;top:40%;left:30%}
+.container{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:0 16px}
+.header{text-align:center;padding:44px 20px 16px}
+.header h1{font-size:30px;background:linear-gradient(135deg,#e2b0ff,#9ecfff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px;font-weight:800}
+.header .sub{color:#6b7394;font-size:12px;margin-top:4px;letter-spacing:1px}
+.moti-wrap{padding:0 16px;margin-bottom:16px}
+.moti{background:linear-gradient(135deg,rgba(102,126,234,.12),rgba(118,75,162,.12));border:1px solid rgba(102,126,234,.2);border-radius:16px;padding:14px 18px;text-align:center;font-size:15px;color:#c8b6ff;line-height:1.6;animation:float 3s ease-in-out infinite;min-height:52px;display:flex;align-items:center;justify-content:center}
+.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+.tab-btn{padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#8892b0;cursor:pointer;transition:.25s}
+.tab-btn.active{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-color:transparent;box-shadow:0 4px 15px rgba(102,126,234,.3)}
+.date-nav{display:flex;align-items:center;justify-content:center;gap:16px;padding:8px 16px}
+.date-nav button{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#ccc;width:42px;height:42px;border-radius:50%;font-size:20px;cursor:pointer;transition:.2s}
+.date-nav button:hover{background:rgba(255,255,255,.15)}
+.date-nav button:disabled{opacity:.2}
+.date-display{text-align:center;min-width:180px}
+.date-display .day-num{font-size:38px;font-weight:800;color:#fff;line-height:1}
+.date-display .date-text{font-size:12px;color:#8892b0;margin-top:4px}
+.today-btn{display:block;margin:8px auto 12px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:#fff;padding:8px 22px;border-radius:20px;font-size:13px;cursor:pointer}
+.today-btn.hidden{display:none}
+.progress-bar{margin:0 auto 20px;padding:0 16px}
+.progress-outer{background:rgba(255,255,255,.06);border-radius:10px;height:6px;overflow:hidden}
+.progress-inner{height:100%;border-radius:10px;background:linear-gradient(90deg,#667eea,#764ba2,#f093fb);transition:width .5s}
+.progress-label{text-align:center;font-size:11px;color:#6b7394;margin-top:5px}
+.dice-area{text-align:center;padding:10px 16px 20px;display:none}
+.dice-btn{width:100px;height:100px;border-radius:24px;border:none;background:linear-gradient(145deg,#ff6b6b,#ee5a24);color:#fff;font-size:48px;cursor:pointer;box-shadow:0 8px 25px rgba(238,90,36,.3)}
+.dice-btn:active{transform:scale(.95)}
+.dice-btn.rolling{animation:shake .15s linear infinite;pointer-events:none}
+.dice-hint{font-size:13px;color:#8892b0;margin-top:12px}
+.dice-filters{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px}
+.filter-chip{padding:5px 12px;border-radius:12px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#8892b0;cursor:pointer;transition:.2s}
+.filter-chip.active{background:rgba(102,126,234,.2);color:#9ecfff;border-color:rgba(102,126,234,.4)}
+.dice-history{margin-top:16px;font-size:12px;color:#556}
+.card{padding:0 16px;margin-bottom:20px;animation:fadeIn .4s ease}
+.card-inner{background:rgba(255,255,255,.05);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden}
+.card-badge{display:flex;align-items:center;gap:8px;padding:16px 20px 10px}
+.cat-tag{display:inline-block;padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700}
+.week-tag{font-size:11px;color:#6b7394}
+.card-title{font-size:21px;font-weight:800;color:#fff;padding:0 20px 10px;line-height:1.4}
+.card-text{font-size:15px;line-height:1.85;color:#c8c8d8;padding:0 20px 14px;white-space:pre-wrap;word-break:break-word}
+.card-tags{font-size:12px;color:#667eea;padding:0 20px 14px;line-height:1.6}
+.card-actions{display:flex;border-top:1px solid rgba(255,255,255,.06)}
+.card-actions button{flex:1;background:none;border:none;color:#8892b0;padding:14px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
+.card-actions button:hover{background:rgba(255,255,255,.05);color:#fff}
+.card-actions button+button{border-left:1px solid rgba(255,255,255,.06)}
+.card-actions button.copied{color:#81c784}
+.phase-info{text-align:center;margin-bottom:16px}
+.phase-badge{display:inline-block;padding:5px 14px;border-radius:14px;font-size:12px;font-weight:600;background:rgba(102,126,234,.12);color:#667eea;border:1px solid rgba(102,126,234,.25)}
+.no-post{text-align:center;color:#6b7394;padding:60px 20px}
+.no-post .emoji{font-size:48px;margin-bottom:12px}
+.calendar-toggle{text-align:center;margin-bottom:16px}
+.calendar-toggle button{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#8892b0;padding:7px 18px;border-radius:14px;font-size:12px;cursor:pointer}
+.mini-cal{margin-bottom:20px;display:none}
+.mini-cal.show{display:block}
+.mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.mini-cal-grid .cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:11px;border-radius:8px;cursor:pointer;color:#6b7394;transition:.15s}
+.mini-cal-grid .cell:hover{background:rgba(255,255,255,.1)}
+.mini-cal-grid .cell.today{background:rgba(102,126,234,.3);color:#fff;font-weight:700}
+.mini-cal-grid .cell.active{background:rgba(186,104,200,.3);color:#fff}
+.mini-cal-grid .cell.past{color:#333}
+.mini-cal-month{text-align:center;color:#fff;font-size:13px;font-weight:600;margin-bottom:6px;display:flex;justify-content:center;align-items:center;gap:14px}
+.mini-cal-month button{background:none;border:none;color:#6b7394;font-size:16px;cursor:pointer;padding:4px 8px}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(102,126,234,.95);color:#fff;padding:12px 24px;border-radius:20px;font-size:14px;font-weight:600;z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 8px 25px rgba(0,0,0,.3)}
+.toast.show{opacity:1;bottom:90px}
+.confetti-piece{position:fixed;width:8px;height:8px;z-index:998;pointer-events:none;border-radius:2px}
+.footer{text-align:center;padding:30px 20px 60px;color:#333;font-size:11px}
+.loading{text-align:center;padding:60px;color:#667eea;font-size:16px}
+</style>
+</head>
+<body>
+<div class="bg-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div class="container">
+<div class="header"><h1>✦ 軟裝日曆 ✦</h1><div class="sub">365 天 Threads 發文助手</div></div>
+<div class="moti-wrap"><div class="moti" id="moti"></div></div>
+<div class="tabs">
+<button class="tab-btn active" onclick="switchMode('today')">📅 今日文案</button>
+<button class="tab-btn" onclick="switchMode('dice')">🎲 隨機抽文</button>
+</div>
+<div id="todayMode">
+<div class="date-nav"><button id="prevBtn" onclick="navigate(-1)">‹</button><div class="date-display"><div class="day-num" id="dayNum">—</div><div class="date-text" id="dateText">—</div></div><button id="nextBtn" onclick="navigate(1)">›</button></div>
+<button class="today-btn hidden" id="todayBtn" onclick="goToday()">↻ 回到今天</button>
+<div class="progress-bar"><div class="progress-outer"><div class="progress-inner" id="progressBar"></div></div><div class="progress-label" id="progressLabel"></div></div>
+<div class="phase-info"><span class="phase-badge" id="phaseBadge"></span></div>
+<div class="calendar-toggle"><button onclick="toggleCal()">📅 月曆總覽</button></div>
+<div class="mini-cal" id="miniCal"></div>
+</div>
+<div class="dice-area" id="diceMode">
+<button class="dice-btn" id="diceBtn" onclick="rollDice()">🎲</button>
+<div class="dice-hint">按骰子抽一篇！不喜歡就再骰 🎰</div>
+<div class="dice-filters" id="diceFilters"></div>
+<div class="dice-history" id="diceHistory"></div>
+</div>
+<div id="cardArea"><div class="loading">載入中...</div></div>
+<div class="footer">軟裝日曆 — 複製 → 貼上 → 發文 💜</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const MOTIVATIONS=["今天的你，比昨天更靠近夢想一步 ✨", "每一篇發文都是在播種，收穫只是時間問題 🌱", "你的專業值得被更多人看見 💎", "持續就是最強的競爭力，你做得到 🔥", "不需要完美，只需要開始 💪", "今天又是離全職軟裝師更近的一天 🏠", "你的品味就是你最大的武器 ⚡", "發文不是負擔，是在累積未來的客戶 📈", "比起等待機會，不如自己創造機會 🎯", "堅持 30 天你就贏過 90% 的人了 🏆", "每個大帳號都從 0 開始的，你也可以 💫", "今天的內容會幫到某個正在煩惱裝潢的人 🤝", "慢慢來比較快，穩穩發比較強 🐢", "你不是沒作品，你是還沒被看見 👀", "放輕鬆，當作跟朋友聊天就好 ☕", "一年後的你會感謝現在開始的自己 🙏", "不用跟別人比，跟昨天的自己比就好 🌟", "你的故事就是最好的內容 📖", "發完這篇，今天的任務就完成了！🎉", "相信過程，結果不會讓你失望 🦋", "專業不是天生的，是累積出來的 📚", "今天也是充滿可能性的一天 🌈", "你的眼光比你想的更有價值 💰", "每一個讚都是一個潛在客戶 ❤️", "做自己喜歡的事，順便賺錢，多好 😊", "演算法會獎勵持續產出的人 🤖", "今天的付出，明天的訂單 📦", "你已經走了這麼遠，別停下來 🚀", "軟裝的世界需要你的聲音 🎤", "深呼吸，打開 Threads，複製貼上，搞定！✅", "再撐一下，爆紅就在轉角 🎰"];
+const START=new Date(2026,2,22),WD=['日','一','二','三','四','五','六'];
+let POSTS=[],mode='today',currentIndex=0,diceIndex=-1,diceFilter=null,rollCount=0;
+let calMonth=new Date().getMonth(),calYear=new Date().getFullYear(),calVisible=false;
+function getPhase(d){if(d<=90)return'第一階段：起號養號';if(d<=180)return'第二階段：擴大影響力';if(d<=270)return'第三階段：變現轉化';return'第四階段：品牌深耕'}
+function getTodayIndex(){const t=new Date();t.setHours(0,0,0,0);const s=new Date(START);s.setHours(0,0,0,0);return Math.max(0,Math.min(Math.floor((t-s)/864e5),POSTS.length-1))}
+function getMoti(){const t=new Date();return MOTIVATIONS[(t.getFullYear()*1000+t.getMonth()*31+t.getDate())%MOTIVATIONS.length]}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function confetti(){const c=['#667eea','#764ba2','#f093fb','#ff6b6b','#ffd93d','#6bcb77','#4d96ff'];for(let i=0;i<20;i++){const e=document.createElement('div');e.className='confetti-piece';e.style.cssText=`left:${Math.random()*100}vw;top:${60+Math.random()*30}vh;background:${c[Math.floor(Math.random()*c.length)]};animation:confetti ${.8+Math.random()*.8}s ease-out forwards;animation-delay:${Math.random()*.3}s`;document.body.appendChild(e);setTimeout(()=>e.remove(),2000)}}
+function switchMode(m){mode=m;document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===(m==='today'?0:1)));document.getElementById('todayMode').style.display=m==='today'?'block':'none';document.getElementById('diceMode').style.display=m==='dice'?'block':'none';if(m==='today')render();else{renderFilters();if(diceIndex>=0)renderCard(POSTS[diceIndex]);else document.getElementById('cardArea').innerHTML='<div class="no-post"><div class="emoji">🎲</div>按上面的骰子開始抽文！</div>'}}
+function render(){if(!POSTS.length)return;const p=POSTS[currentIndex];if(!p)return;const d=new Date(p.dt),todayIdx=getTodayIndex(),isToday=currentIndex===todayIdx;document.getElementById('dayNum').textContent='Day '+p.d;document.getElementById('dateText').textContent=p.dt.replace(/-/g,'/')+'（週'+WD[d.getDay()]+'）第'+p.w+'週';document.getElementById('prevBtn').disabled=currentIndex<=0;document.getElementById('nextBtn').disabled=currentIndex>=POSTS.length-1;document.getElementById('todayBtn').classList.toggle('hidden',isToday);const pct=Math.round(p.d/365*100);document.getElementById('progressBar').style.width=pct+'%';document.getElementById('progressLabel').textContent='進度 '+p.d+' / 365（'+pct+'%）';document.getElementById('phaseBadge').textContent=getPhase(p.d);renderCard(p)}
+function navigate(dir){currentIndex=Math.max(0,Math.min(POSTS.length-1,currentIndex+dir));render();if(calVisible)renderCal()}
+function goToday(){currentIndex=getTodayIndex();render();if(calVisible)renderCal()}
+function renderFilters(){const cats=[...new Set(POSTS.map(p=>p.c))];let h='<span class="filter-chip'+(diceFilter===null?' active':'')+'" onclick="setFilter(null)">全部</span>';cats.forEach(c=>{h+='<span class="filter-chip'+(diceFilter===c?' active':'')+`" onclick="setFilter('${c}')">${c}</span>`});document.getElementById('diceFilters').innerHTML=h}
+function setFilter(f){diceFilter=f;renderFilters()}
+function rollDice(){const btn=document.getElementById('diceBtn');btn.classList.add('rolling');const pool=diceFilter?POSTS.filter(p=>p.c===diceFilter):POSTS;if(!pool.length){btn.classList.remove('rolling');showToast('這個分類沒有文案');return}let count=0;const iv=setInterval(()=>{renderCard(pool[Math.floor(Math.random()*pool.length)]);count++;if(count>10){clearInterval(iv);const final=pool[Math.floor(Math.random()*pool.length)];diceIndex=POSTS.indexOf(final);renderCard(final);btn.classList.remove('rolling');confetti();rollCount++;document.getElementById('diceHistory').textContent='已骰 '+rollCount+' 次'}},100)}
+function renderCard(p){document.getElementById('cardArea').innerHTML=`<div class="card"><div class="card-inner"><div class="card-badge"><span class="cat-tag" style="background:rgba(102,126,234,.15);color:#9ecfff">${p.c}</span><span class="week-tag">Day ${p.d}・第${p.w}週</span></div><div class="card-title">${escHtml(p.t)}</div><div class="card-text">${escHtml(p.x)}</div>${p.h?'<div class="card-tags">'+escHtml(p.h)+'</div>':''}<div class="card-actions"><button onclick="copyPost(this,'text')">📋 複製文案</button><button onclick="copyPost(this,'full')">📋 文案+Tags</button>${mode==='dice'?'<button onclick="rollDice()">🎲 再骰</button>':''}</div></div></div>`}
+function copyPost(btn,type){const idx=mode==='dice'?diceIndex:currentIndex;const p=POSTS[idx];if(!p)return;let t=p.x;if(type==='full'&&p.h)t+='\n\n'+p.h;navigator.clipboard.writeText(t).then(()=>{btn.classList.add('copied');btn.innerHTML='✅ 已複製！';showToast('已複製到剪貼簿！去貼文吧 💜');confetti();setTimeout(()=>{btn.classList.remove('copied');btn.innerHTML=type==='full'?'📋 文案+Tags':'📋 複製文案'},1800)})}
+function toggleCal(){calVisible=!calVisible;document.getElementById('miniCal').classList.toggle('show',calVisible);if(calVisible)renderCal()}
+function renderCal(){const today=new Date();today.setHours(0,0,0,0);const first=new Date(calYear,calMonth,1),sd=first.getDay(),dim=new Date(calYear,calMonth+1,0).getDate();const mn=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];let h=`<div class="mini-cal-month"><button onclick="calNav(-1)">‹</button><span>${calYear} ${mn[calMonth]}</span><button onclick="calNav(1)">›</button></div><div class="mini-cal-grid">`;['日','一','二','三','四','五','六'].forEach(d=>{h+='<div class="cell" style="color:#444;font-weight:600;cursor:default">'+d+'</div>'});for(let i=0;i<sd;i++)h+='<div class="cell"></div>';for(let d=1;d<=dim;d++){const dt=new Date(calYear,calMonth,d);dt.setHours(0,0,0,0);const diff=Math.floor((dt-START)/864e5),valid=diff>=0&&diff<POSTS.length;const isT=dt.getTime()===today.getTime(),isA=diff===currentIndex;let cls='cell';if(isT)cls+=' today';if(isA)cls+=' active';if(dt<today&&!isT&&valid)cls+=' past';h+=valid?`<div class="${cls}" onclick="jumpTo(${diff})">${d}</div>`:`<div class="cell" style="opacity:.15;cursor:default">${d}</div>`}h+='</div>';document.getElementById('miniCal').innerHTML=h}
+function calNav(dir){calMonth+=dir;if(calMonth>11){calMonth=0;calYear++}if(calMonth<0){calMonth=11;calYear--}renderCal()}
+function jumpTo(i){currentIndex=i;render();if(calVisible)renderCal()}
+let tx=0;document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX});document.addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-tx;if(mode==='today'&&Math.abs(d)>60)navigate(d<0?1:-1)});document.addEventListener('keydown',e=>{if(mode==='today'){if(e.key==='ArrowLeft')navigate(-1);if(e.key==='ArrowRight')navigate(1)}if(e.key===' '&&mode==='dice'){e.preventDefault();rollDice()}});
+document.getElementById('moti').textContent=getMoti();
+fetch('p.json').then(r=>r.json()).then(data=>{POSTS=data;currentIndex=getTodayIndex();render()}).catch(()=>{document.getElementById('cardArea').innerHTML='<div class="no-post"><div class="emoji">⚠️</div>載入失敗，請重新整理</div>'});
+</script>
+</body>
+</html>
